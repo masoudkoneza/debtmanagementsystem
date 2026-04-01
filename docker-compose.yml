@@ -1,0 +1,97 @@
+# docker-compose.yml
+#
+# Defines the three services that make up the DMS stack (spec §3.1):
+#
+#   db        — PostgreSQL 15 database
+#   backend   — Django REST API on port 8000
+#   frontend  — Vite dev server on port 5173
+#
+# Getting started (from a fresh clone with only Docker installed):
+#
+#   cp .env.example .env          # Fill in your values
+#   docker-compose up             # Build images and start all services
+#
+# The backend container runs migrations automatically on startup via
+# the CMD in backend/Dockerfile, so no manual migration step is needed.
+
+#version: '3.9'
+
+services:
+
+  # ── PostgreSQL database ────────────────────────────────────────────────────
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      # Credentials are read from the .env file (never hardcoded here).
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      # Named volume persists data across container restarts.
+      # Without this, the database is wiped every time the container restarts.
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # Backend waits for this check to pass before starting (depends_on condition).
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Django backend ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      # Expose Django dev server on the host so Postman / curl can reach it.
+      - "8000:8000"
+    environment:
+      # Django settings — read from .env
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      # Database connection — uses individual variables (no DATABASE_URL needed)
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: db          # Docker Compose service name, resolved by Docker DNS
+      DB_PORT: 5432
+    volumes:
+      # Mount source code so code changes reload without rebuilding the image.
+      - ./backend:/app
+    depends_on:
+      db:
+        # Wait for Postgres to be ready before starting Django.
+        # Without this, Django's migrate command fails with a connection error.
+        condition: service_healthy
+
+  # ── Vite frontend ──────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      # Vite dev server — open http://localhost:5173 in the browser
+      - "5173:5173"
+    environment:
+      # The API base URL that Axios uses.  Because Vite's proxy rewrites
+      # /api/* requests to the backend service, this can be empty or the
+      # host-accessible URL depending on the deployment target.
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    volumes:
+      # Mount source code for Hot Module Replacement (instant UI updates on save).
+      - ./frontend:/app
+      # Prevent the host's node_modules from overwriting the container's.
+      # This anonymous volume takes precedence over the src mount above.
+      - /app/node_modules
+    depends_on:
+      - backend
+
+# ── Named volumes ──────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    # Persists the database across docker-compose down / up cycles.
+    # Use 'docker-compose down -v' to wipe the database completely.
