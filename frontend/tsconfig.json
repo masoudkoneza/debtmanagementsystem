@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    // Target modern browsers — ES2020 is supported by all evergreen browsers.
+    "target": "ES2020",
+    // Enable DOM and ES lib type definitions.
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    // Vite uses ES modules; bundler mode means TypeScript won't emit
+    // module resolution errors for Vite-specific features.
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    // Allow importing .ts files without an explicit extension.
+    "resolveJsonModule": true,
+    // Emit no JS — Vite handles compilation.
+    "noEmit": true,
+    // Strict mode catches common bugs at compile time.
+    "strict": true,
+    // Allow default imports from CommonJS modules (e.g. React).
+    "esModuleInterop": true,
+    // Required for React 17+ JSX transform (no need to import React in every file).
+    "jsx": "react-jsx",
+    // Prevent accidental reference to browser globals in Node scripts.
+    "isolatedModules": true,
+    // Ensure consistent file casing (important on case-insensitive macOS).
+    "forceConsistentCasingInFileNames": true,
+    // Skip lib type checking for faster builds.
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
