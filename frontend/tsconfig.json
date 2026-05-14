@@ -18,6 +18,8 @@
     "esModuleInterop": true,
     // Required for React 17+ JSX transform (no need to import React in every file).
     "jsx": "react-jsx",
+    // Include Vite-specific type definitions for import.meta.env.
+    "types": ["vite/client"],
     // Prevent accidental reference to browser globals in Node scripts.
     "isolatedModules": true,
     // Ensure consistent file casing (important on case-insensitive macOS).

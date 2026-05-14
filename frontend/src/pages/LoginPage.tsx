@@ -25,6 +25,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectIsAuthenticated, setCredentials } from '../store/authSlice';
 import { login } from '../services/authService';
 import type { AuthUser } from '../store/authSlice';
+import BrandLogo from '../components/BrandLogo';
 
 const { Title } = Typography;
 
@@ -139,12 +140,7 @@ const LoginPage: React.FC = () => {
       >
         {/* ── Heading (spec: "Koneza Systems heading above the form") ───── */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <Title level={3} style={{ margin: 0, color: '#1677ff' }}>
-            Koneza Systems
-          </Title>
-          <Typography.Text type="secondary">
-            Debt Management System
-          </Typography.Text>
+          <BrandLogo />
         </div>
 
         {/* ── Login form ─────────────────────────────────────────────────── */}

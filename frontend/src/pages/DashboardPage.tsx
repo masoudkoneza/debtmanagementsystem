@@ -19,6 +19,7 @@ import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { clearCredentials, selectCurrentUser } from '../store/authSlice';
+import BrandLogo from '../components/BrandLogo';
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -61,16 +62,15 @@ const DashboardPage: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#fff',
-          borderBottom: '1px solid #f0f0f0',
+          backgroundColor: '#020617',
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
           padding: '0 24px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          minHeight: 72,
+          boxShadow: '0 2px 10px rgba(0,0,0,0.16)',
         }}
       >
         {/* Brand name */}
-        <Title level={4} style={{ margin: 0, color: '#1677ff' }}>
-          Koneza Systems — DMS
-        </Title>
+        <BrandLogo compact />
 
         {/* User info + Sign out */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
